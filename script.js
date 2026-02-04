@@ -1,6 +1,5 @@
 (function () {
   "use strict";
-
   // Configuration constants
   const SCROLL_OFFSET = 36; // Offset for fixed header when scrolling to sections
   const INTERSECTION_ROOT_MARGIN = '-50% 0px -50% 0px'; // Margin for section intersection detection
@@ -48,9 +47,13 @@
     };
   };
 
+  // ==========================================
+  // NAVIGATION
+  // ==========================================
+  
   let navbarlinks = select(".nav .nav__link", true);
 
-  const observer = new IntersectionObserver((entries) => {
+  const navObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         navbarlinks.forEach(link => {
@@ -66,7 +69,7 @@
   });
 
   document.querySelectorAll('section').forEach(section => {
-    observer.observe(section);
+    navObserver.observe(section);
   });
   
   /**
@@ -86,26 +89,26 @@
     this.classList.toggle("bx-x");
   });
 
-
-  // Use event delegation for portfolio items
   const portfolioGrid = select('.portfolio__grid');
   if (portfolioGrid) {
-    portfolioGrid.addEventListener('click', function(e) {
+    portfolioGrid.addEventListener('touchstart', function(e) {
       const portfolioCard = e.target.closest('.portfolio__card');
       if (!portfolioCard) return;
 
-      const wasActive = portfolioCard.classList.contains('mobile-active');
-
-      // Remove active class from all cards
       portfolioGrid.querySelectorAll('.portfolio__card').forEach(card => {
         card.classList.remove('mobile-active');
       });
 
-      // Toggle the clicked card
-      if (!wasActive) {
-        portfolioCard.classList.add('mobile-active');
+      portfolioCard.classList.add('mobile-active');
+    }, { passive: true });
+
+    document.addEventListener('touchstart', function(e) {
+      if (!e.target.closest('.portfolio__card')) {
+        portfolioGrid.querySelectorAll('.portfolio__card').forEach(card => {
+          card.classList.remove('mobile-active');
+        });
       }
-    });
+    }, { passive: true });
   }
 
   on(
@@ -133,6 +136,39 @@
     }
   });
 
+  // ==========================================
+  // SCROLL ANIMATIONS
+  // ==========================================
+
+  const animateObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        // Handle delay if specified
+        const delay = entry.target.dataset.animateDelay;
+        if (delay) {
+          setTimeout(() => {
+            entry.target.classList.add('animate-visible');
+          }, parseInt(delay, 10));
+        } else {
+          entry.target.classList.add('animate-visible');
+        }
+        // Stop observing once animated
+        animateObserver.unobserve(entry.target);
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+  });
+
+  document.querySelectorAll('[data-animate]').forEach(el => {
+    animateObserver.observe(el);
+  });
+
+  // ==========================================
+  // PORTFOLIO FILTER
+  // ==========================================
+
   window.addEventListener("load", () => {
     let container = select(".portfolio__grid");
     if (container && typeof Isotope !== "undefined") {
@@ -146,33 +182,23 @@
           filters.forEach((el) => el.classList.remove("filter-active"));
           this.classList.add("filter-active");
           iso.arrange({ filter: this.getAttribute("data-filter") });
-          if (typeof AOS !== "undefined" && AOS.refresh) {
-            iso.on("arrangeComplete", () => AOS.refresh());
-          }
         },
         true
       );
     }
   });
 
+  // ==========================================
+  // GLIGHTBOX
+  // ==========================================
+
   const portfolioLightbox = typeof GLightbox !== "undefined"
     ? GLightbox({ selector: ".portfolio__lightbox" })
     : null;
 
-  if (typeof Swiper !== "undefined") {
-    new Swiper(".portfolio-details-slider", {
-      speed: 400,
-      loop: true,
-      autoplay: { delay: 5000, disableOnInteraction: false },
-      pagination: { el: ".swiper-pagination", type: "bullets", clickable: true },
-    });
-  }
-
-  window.addEventListener("load", () => {
-    if (typeof AOS !== "undefined" && AOS.init) {
-      AOS.init({ duration: 1000, easing: "ease-in-out", once: true, mirror: false });
-    }
-  });
+  // ==========================================
+  // VIDEO LAZY LOADING
+  // ==========================================
 
   /**
    * Lazy load video sources for videos with data-src attribute
@@ -208,6 +234,7 @@
   document.addEventListener("DOMContentLoaded", injectVideoSources);
   window.addEventListener("resize", debounce(injectVideoSources, DEBOUNCE_DELAY));
 
+  // Inject video sources when lightbox opens
   if (portfolioLightbox && typeof portfolioLightbox.on === "function") {
     portfolioLightbox.on("open", injectVideoSources);
     portfolioLightbox.on("slide_changed", injectVideoSources);

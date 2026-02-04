@@ -48,7 +48,6 @@ body {
   box-sizing: border-box;
 }
 
-/* Focus styles for accessibility */
 *:focus-visible {
   outline: 2px solid var(--color-text-highlight);
   outline-offset: 2px;
@@ -125,7 +124,7 @@ section {
   margin-left: calc(var(--gutter-x) / -2);
 }
 
-.row > * {
+.row>* {
   flex-shrink: 0;
   width: 100%;
   max-width: 100%;
@@ -1080,4 +1079,34 @@ section {
   #main {
     margin-left: 0;
   }
+}
+
+/* ==========================================
+   SCROLL ANIMATIONS
+   ========================================== */
+
+[data-animate] {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+[data-animate].animate-visible {
+  opacity: 1;
+  transform: none !important;
+}
+
+[data-animate="fade-up"] {
+  transform: translateY(30px);
+}
+
+[data-animate="fade-right"] {
+  transform: translateX(-30px);
+}
+
+[data-animate="fade-left"] {
+  transform: translateX(30px);
+}
+
+.glightbox-desc {
+  display: none;
 }
