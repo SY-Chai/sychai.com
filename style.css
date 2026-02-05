@@ -303,16 +303,10 @@ section {
   transform: translateY(-2px);
 }
 
-.social-links a:hover {
-  background: var(--color-text-highlight);
-  color: var(--color-text-main);
-  text-decoration: none;
-}
-
 @media (max-width: 991px) {
   #header .header__profile .social-links a {
-    font-size: 18px;
-    padding: 8px 0;
+    font-size: 22px;
+    padding: 7px 0;
     width: 36px;
     height: 36px;
   }
