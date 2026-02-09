@@ -172,19 +172,21 @@
   window.addEventListener("load", () => {
     let container = select(".portfolio__grid");
     if (container && typeof Isotope !== "undefined") {
-      let iso = new Isotope(container, { itemSelector: ".portfolio__item" });
-      let filters = select(".portfolio__filters li", true);
-      on(
-        "click",
-        ".portfolio__filters li",
-        function (e) {
-          e.preventDefault();
-          filters.forEach((el) => el.classList.remove("filter-active"));
-          this.classList.add("filter-active");
-          iso.arrange({ filter: this.getAttribute("data-filter") });
-        },
-        true
-      );
+      requestAnimationFrame(() => {
+        let iso = new Isotope(container, { itemSelector: ".portfolio__item" });
+        let filters = select(".portfolio__filters li", true);
+        on(
+          "click",
+          ".portfolio__filters li",
+          function (e) {
+            e.preventDefault();
+            filters.forEach((el) => el.classList.remove("filter-active"));
+            this.classList.add("filter-active");
+            iso.arrange({ filter: this.getAttribute("data-filter") });
+          },
+          true
+        );
+      });
     }
   });
 
