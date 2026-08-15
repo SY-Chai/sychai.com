@@ -652,6 +652,7 @@ section {
   font-size: 18px;
   font-family: "Poppins", sans-serif;
   max-width: 30vw;
+  text-wrap: pretty;
 }
 
 #hero p span {
