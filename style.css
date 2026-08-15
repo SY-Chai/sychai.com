@@ -636,6 +636,7 @@ section {
   font-weight: 700;
   line-height: 56px;
   color: var(--color-text-main);
+  text-wrap: nowrap;
 }
 
 #hero h2 {
