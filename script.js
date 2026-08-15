@@ -4,7 +4,6 @@
   const SCROLL_OFFSET = 36; // Offset for fixed header when scrolling to sections
   const INTERSECTION_ROOT_MARGIN = '-50% 0px -50% 0px'; // Margin for section intersection detection
   const MIN_VIEWPORT_WIDTH_FOR_VIDEO = 992; // Minimum viewport width for video display
-  const DEBOUNCE_DELAY = 250; // Milliseconds to wait before executing debounced functions
 
   /**
    * Select DOM element(s) using a CSS selector
@@ -31,20 +30,6 @@
     if (!els) return;
     if (all) els.forEach((e) => e.addEventListener(type, listener));
     else els.addEventListener(type, listener);
-  };
-
-  /**
-   * Debounce function execution to limit how often it can be called
-   * @param {Function} func - Function to debounce
-   * @param {number} delay - Delay in milliseconds before function executes
-   * @returns {Function} Debounced function
-   */
-  const debounce = (func, delay) => {
-    let timeoutId;
-    return function (...args) {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func.apply(this, args), delay);
-    };
   };
 
   // ==========================================
@@ -203,9 +188,11 @@
   // ==========================================
 
   /**
-   * Lazy load video sources for videos with data-src attribute
-   * Only loads videos on desktop viewports (min-width: 992px)
-   * Prevents re-injection if source already exists
+   * Lazy load video sources for videos with data-src attribute.
+   * Called only when the lightbox opens, so no video bytes are
+   * downloaded until a project is actually viewed.
+   * Only loads videos on desktop viewports (min-width: 992px).
+   * Prevents re-injection if source already exists.
    */
   function injectVideoSources() {
     if (!window.matchMedia(`(min-width: ${MIN_VIEWPORT_WIDTH_FOR_VIDEO}px)`).matches) return;
@@ -232,9 +219,6 @@
       });
     });
   }
-
-  document.addEventListener("DOMContentLoaded", injectVideoSources);
-  window.addEventListener("resize", debounce(injectVideoSources, DEBOUNCE_DELAY));
 
   // Inject video sources when lightbox opens
   if (portfolioLightbox && typeof portfolioLightbox.on === "function") {
