@@ -3,7 +3,6 @@
   // Configuration constants
   const SCROLL_OFFSET = 36; // Offset for fixed header when scrolling to sections
   const INTERSECTION_ROOT_MARGIN = '-50% 0px -50% 0px'; // Margin for section intersection detection
-  const MIN_VIEWPORT_WIDTH_FOR_VIDEO = 992; // Minimum viewport width for video display
 
   /**
    * Select DOM element(s) using a CSS selector
@@ -179,50 +178,17 @@
   // GLIGHTBOX
   // ==========================================
 
-  const portfolioLightbox = typeof GLightbox !== "undefined"
-    ? GLightbox({ selector: ".portfolio__lightbox" })
-    : null;
+  if (typeof GLightbox !== "undefined") {
+    const lightbox = GLightbox({ selector: ".portfolio__lightbox" });
 
-  // ==========================================
-  // VIDEO LAZY LOADING
-  // ==========================================
-
-  /**
-   * Lazy load video sources for videos with data-src attribute.
-   * Called only when the lightbox opens, so no video bytes are
-   * downloaded until a project is actually viewed.
-   * Only loads videos on desktop viewports (min-width: 992px).
-   * Prevents re-injection if source already exists.
-   */
-  function injectVideoSources() {
-    if (!window.matchMedia(`(min-width: ${MIN_VIEWPORT_WIDTH_FOR_VIDEO}px)`).matches) return;
-    document.querySelectorAll("video[data-src]").forEach((video) => {
-      // Skip if already injected
-      if (video.querySelector("source")) return;
-
-      const url = video.getAttribute("data-src");
-      if (!url) return;
-
-      // Create and append <source> element
-      const src = document.createElement("source");
-      src.src = url;
-      src.type = "video/mp4";
-      video.appendChild(src);
-
-      video.autoplay = true;
-      video.muted = true;
-      video.loop = true;
-
-      video.load();
-      video.play().catch((err) => {
-        console.warn("Video play was prevented:", err);
-      });
+    lightbox.on("slide_changed", ({ current }) => {
+      const slides = lightbox.slidesContainer.querySelectorAll(".gslide");
+      slides.forEach((slide) => slide.querySelector("video")?.pause());
+      slides[current.index]?.querySelector("video")?.play().catch(() => {});
     });
-  }
 
-  // Inject video sources when lightbox opens
-  if (portfolioLightbox && typeof portfolioLightbox.on === "function") {
-    portfolioLightbox.on("open", injectVideoSources);
-    portfolioLightbox.on("slide_changed", injectVideoSources);
+    lightbox.on("close", () => {
+      document.querySelectorAll("video").forEach((v) => v.pause());
+    });
   }
 })();
