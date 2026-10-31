@@ -814,9 +814,7 @@ section {
 
 .about__resume-btn:hover {
   background-color: var(--color-text-highlight);
-  box-shadow: 0 6px 12px rgba(46, 89, 217, 0.3);
-  text-decoration: none;
-  color: var(--color-text-main);
+  color: var(--color-bg-social);
 }
 
 @media (max-height: 500px) and (orientation: landscape) {
