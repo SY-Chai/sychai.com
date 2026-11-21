@@ -178,14 +178,29 @@ window.addEventListener("load", () => {
 
 if (typeof GLightbox !== "undefined") {
   const lightbox = GLightbox({ selector: ".portfolio__lightbox" });
+  const desktopMediaQuery = window.matchMedia("(min-width: 992px)");
 
   lightbox.on("slide_changed", ({ current }) => {
     const slides = lightbox.slidesContainer.querySelectorAll(".gslide");
     slides.forEach((slide) => slide.querySelector("video")?.pause());
-    slides[current.index]?.querySelector("video")?.play().catch(() => {});
+
+    const activeVideo = slides[current.index]?.querySelector("video");
+    if (
+      activeVideo &&
+      desktopMediaQuery.matches &&
+      window.getComputedStyle(activeVideo).display !== "none"
+    ) {
+      activeVideo.play().catch(() => {});
+    }
   });
 
   lightbox.on("close", () => {
     document.querySelectorAll("video").forEach((v) => v.pause());
+  });
+
+  desktopMediaQuery.addEventListener("change", (e) => {
+    if (!e.matches) {
+      document.querySelectorAll("video").forEach((v) => v.pause());
+    }
   });
 }
